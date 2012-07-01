@@ -1,0 +1,5 @@
+catanClient.view.cityView = {
+	
+	
+		
+};

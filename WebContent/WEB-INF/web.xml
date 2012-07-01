@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>Six_Cobbler_Catan</display-name>
+	<welcome-file-list>
+		<welcome-file>catan.jsp</welcome-file>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>default.html</welcome-file>
+		<welcome-file>default.htm</welcome-file>
+		<welcome-file>default.jsp</welcome-file>
+	</welcome-file-list>
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath*:conf/applicationContext.xml</param-value>
+	</context-param>
+	 <listener>
+        <description>ServletContextListener</description>
+        <listener-class>org.jwebsocket.appserver.ContextListener</listener-class>
+    </listener>
+    <listener>
+        <description>HttpSessionListener</description>
+        <listener-class>org.jwebsocket.appserver.SessionListener</listener-class>
+    </listener>
+    <listener>
+		<description>Spring ContextListener</description>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+    <servlet>
+        <servlet-name>WebSocketDemo</servlet-name>
+        <servlet-class>org.jwebsocket.appserver.WebSocketDemo</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WebSocketDemo</servlet-name>
+        <url-pattern>/WebSocketDemo</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>ServletBridge</servlet-name>
+        <servlet-class>org.jwebsocket.appserver.ServletBridge</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ServletBridge</servlet-name>
+        <url-pattern>/ServletBridge</url-pattern>
+    </servlet-mapping>
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+</web-app>

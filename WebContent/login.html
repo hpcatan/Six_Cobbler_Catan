@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD html 4.01//EN" "http://www.w3.org/TR/html4/transitional.dtd" >
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="chrome=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="js/jWebSocket.js"></script>
+<script type="text/javascript" src="js/jwsSamplesPlugIn.js"></script>
+<script type="text/javascript">
+	
+	var lJWSID= "jWebSocket Catan",
+		eUsername = null,
+		eLog = null;
+	var IN = 0;
+	var OUT = 1;
+	var EVT = 2;
+	var SYS = "SYS";
+	var USR = null;
+	var target =null;
+	
+			
+	function logon() {
+		// URL is ws[s]://[hostname|localhost]:8787[/context][/servlet/][;args...]
+		// you can also use getDefaultSSLServerURL for secured connections
+		var lURL = jws.getDefaultServerURL(); // + "/;timeout=360000";
+		log( SYS, OUT, "Connecting to " + lJWSID + " at " + lURL + "..." );
+
+		// try to establish connection to jWebSocket server
+		lWSC.logon( lURL, eUsername.value, "", {
+
+			// OnOpen callback
+			OnOpen: function( aEvent ) {
+				log( SYS, IN, "Connection to " + lJWSID + " established." );
+				// start keep alive if user selected that option
+				jws.$("simgStatus").src = "image/connected.png";
+			},
+
+			// OnMessage callback
+			OnMessage: function( aEvent, aToken ) {
+				// for debug purposes
+				//if( eDebug.checked ) {
+				//	log( SYS, EVT, "<font style='color:#888'>" +
+				//		( aToken ? aToken.type : "-" ) + ": " +
+				//		aEvent.data + "</font>");
+				//}
+				if( lWSC.isLoggedIn() ) {
+					jws.$("simgStatus").src = "image/authenticated.png";
+				} else {
+					jws.$("simgStatus").src = "image/connected.png";
+				}
+				jws.$("slblClientId").innerHTML =
+					"&nbsp;Client&#x2011;Id:&nbsp;"
+					+ lWSC.getId() + "&nbsp;"
+					+ ( jws.browserSupportsNativeWebSockets ? "(native)" : "(flashbridge)" );
+				if( aToken ) {
+					// is it a response from a previous request of this client?
+					if( aToken.type == "response" ) {
+						// figure out of which request
+						if( aToken.reqType == "login" ) {
+							if( aToken.code == 0 ) {
+								log( SYS, IN, "Welcome '" + aToken.username + "'" );
+								// select message field for convenience
+								//doFocus( eMessage );
+								// call getAuthClients method from
+								// jWebSocket System Client Plug-In
+								//lWSC.getAuthClients({
+								//	pool: null
+								//});
+							} else {
+								log( SYS, IN, "Error logging in '" + eUsername.value + "': " + aToken.msg );
+								// select username again for convenience
+								doFocus( eUsername );
+							}
+						} else if( aToken.reqType == "getClients" ) {
+							log( SYS, IN, "Clients (" + aToken.count + "): " + aToken.clients );
+						}
+						// is it an event w/o a previous request ?
+					} else if( aToken.type == "event" ) {
+						// interpret the event name
+						// :
+					} else if( aToken.type == "goodBye" ) {
+						log( SYS, IN, lJWSID + " says good bye (reason: " + aToken.reason + ")!" );
+						doFocus( eUsername );
+						// is it any token from another client
+					} else if( aToken.type == "broadcast" ) {
+						if( aToken.data && aToken.pool == target) {
+							log( aToken.sender, IN, aToken.data );
+						}
+					}
+				}
+			},
+
+			// OnClose callback
+			OnClose: function( aEvent ) {
+				lWSC.stopKeepAlive();
+				log( SYS, IN, "Disconnected from " + lJWSID + "." );
+				jws.$("simgStatus").src = "../../images/disconnected.png";
+				jws.$("slblClientId").innerHTML = "&nbsp;Client&#x2011;Id:&nbsp;-";
+				doFocus( eUsername );
+			}
+			
+		});
+	}
+	
+	function changeUserNum(num){
+		
+	}
+	
+	function broadcast(roomTarget) {
+		var lMsg = "hello";
+		target = roomTarget;
+		//var lTarget = "*";
+		if( lMsg.length > 0 ) {
+			log( USR, OUT, lMsg );
+			var lRes;
+			lRes = lWSC.broadcastText(
+					roomTarget,	// broadcast to all clients in this room --sam
+					lMsg		// broadcast this message
+				);
+			/* if( !lTarget || lTarget == "*") {
+				lRes = lWSC.broadcastText(
+					"",			// broadcast to all clients (not limited to a certain pool)
+					lMsg		// broadcast this message
+				);
+			} else {
+				lRes = lWSC.sendText(
+					lTarget,	// broadcast to all clients (not limited to a certain pool)
+					lMsg		// broadcast this message
+				);
+			}*/
+			// log error only, on success don't confuse the user
+			if( lRes.code != 0 ) {
+				log( SYS, OUT, "broadcast: " + lRes.msg );
+			}
+			// eMessage.value = "";
+		}
+		//doFocus( eMessage );
+	}
+		
+
+	// append a line to the log text area
+	function log( aUsername, aEvent, aString ) {
+		var lFlag;
+		switch( aEvent ) {
+			case IN: lFlag = "<"; break;
+			case OUT: lFlag = ">"; break;
+			case EVT: lFlag = "*"; break;
+			default: lFlag = "?";
+		}
+		// set a default user name if not yet logged in
+		if( !aUsername ) {
+			aUsername = lWSC.getUsername();
+		}
+		if( !aUsername ) {
+			aUsername = "USR";
+		}
+		eLog.innerHTML +=
+			aUsername + " " +
+			lFlag + " " +
+			aString + "<br>";
+		if( eLog.scrollHeight > eLog.clientHeight ) {
+			eLog.scrollTop = eLog.scrollHeight - eLog.clientHeight;
+		}
+	}
+
+	function clearLog() {
+		eLog.innerHTML = "";
+		eLog.scrollTop = 0;
+	}
+			
+			
+	function initPage() {
+		eLog = jws.$( "sdivChat" );
+	
+		eUsername = jws.$( "eUsername" );
+
+		// jws.browserSupportsWebSockets checks web if sockets are available
+		// either natively, by the Flash Bridge or by the Chrome Frame.
+		if( jws.browserSupportsWebSockets() ) {
+			lWSC = new jws.jWebSocketJSONClient();
+			
+			eUsername.focus();
+		} else {
+			var lMsg = jws.MSG_WS_NOT_SUPPORTED;
+			alert( lMsg );
+			log( lMsg );
+		}
+	}
+
+	function exitPage() {
+		// this allows the server to release the current session
+		// immediately w/o waiting on the timeout.
+		if( lWSC ) {
+			lWSC.close({
+				// force immediate client side disconnect
+				timeout: 0
+			});
+		}
+	}
+</script>
+
+</head>
+
+<body onload="initPage();"
+	  onunload="exitPage();"	>
+	<table width="100%" cellspacing="0" cellpadding="0">
+			<tr>
+				<td  width="">jWebSocket Catan</td>
+				<td  width="1%"><img id="simgStatus" src="image/disconnected.png" align="right"/></td>
+				<td  width="1%"><span id="slblClientId">&nbsp;Client&#x2011;Id:&nbsp;-</span></td>
+			</tr>
+		</table>
+	<table >
+		<tr>
+			<td> userName:</td>
+			<td><input type="text" id ="eUsername"/></td>
+			<td><input type="button" value="login" onclick="logon();"/></td>
+		</tr>
+		<tr>
+			<td> Sam'Room:</td>
+			<td align="center"><span>0</span>/4</td>
+			<td><input type="button" value="Enter Into" id="SamRoom" onclick="broadcast(this.id);"/></td>
+		</tr>
+		
+		<tr>
+			<td> Tank'Room:</td>
+			<td align="center"><span>0</span>/4</td>
+			<td><input type="button" value="Enter Into" id="TankRoom" onclick="broadcast(this.id);"/></td>
+		</tr>
+		
+	</table>
+
+	<div id="sdivChat" style="position:relative; height:300px; background-color:burlywood; overflow:auto;">
+	</div>
+	<input type="button" value="clear log" onclick="clearLog();"/>
+</body>
+</html>

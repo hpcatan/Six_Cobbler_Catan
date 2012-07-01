@@ -1,0 +1,3 @@
+The jWebSocket project requires the jWebSockerServer-Bundle.jar as well as the jWebSocketSamples.jar to be located in Tomcat's /lib folder.
+You can use the jWebSocket.xml configuration file either in Tomcat's /conf folder or in %JWEBSOCKET_HOME%/conf.
+Then deploy the jWebSocket project into tomcat, it will go well.

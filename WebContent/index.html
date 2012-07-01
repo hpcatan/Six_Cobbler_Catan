@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Six Cobbler Catan</title>
+
+<link rel="stylesheet" type="text/css" href="style/catan.css"
+	media="all" />
+</head>
+<body>
+	<div id="catanGame" style="display: none;">
+		<canvas id="catanCanvasId" width="960" height="630"></canvas>
+		<canvas id="staticLandCanvasId" width="960" height="630"></canvas>
+		<canvas id="dynamicLandCanvasId" width="960" height="630"></canvas>
+		<canvas id="userPanelCanvasId" width="960" height="630"></canvas>
+		<canvas id="controlPanelCanvasId" width="960" height="630"></canvas>
+		<canvas id="resourcePanelCanvasId" width="960" height="630"></canvas>
+		<canvas id="tempCanvasId" width="960" height="630"></canvas>
+	</div>
+
+	<script type="text/javascript"
+		src="jsWebsocket/framework/jWebSocket.js"></script>
+
+	<!-- Root -->
+	<script type="text/javascript" src="catanClient/catanClient.js"></script>
+	
+	<script type="text/javascript" src="catanClient/util/catanUtil.js"></script>
+	
+	<!-- Model -->
+	<script type="text/javascript" src="catanClient/model/backgroundModel.js"></script>
+	<script type="text/javascript" src="catanClient/model/resourceModel.js"></script>
+	<script type="text/javascript" src="catanClient/model/landModel.js"></script>
+	<script type="text/javascript" src="catanClient/model/diceModel.js"></script>
+	<script type="text/javascript" src="catanClient/model/userPanelModel.js"></script>
+	<!-- Model Adapter -->
+	<script type="text/javascript" src="catanClient/modelAdapter/userPanelModelAdapter.js"></script>
+	<!-- View -->
+	<script type="text/javascript" src="catanClient/view/backgroundView.js"></script>
+	<script type="text/javascript" src="catanClient/view/resourceView.js"></script>
+	<script type="text/javascript" src="catanClient/view/landView.js"></script>
+	<script type="text/javascript" src="catanClient/view/diceView.js"></script>
+	<script type="text/javascript" src="catanClient/view/villageView.js"></script>
+	<script type="text/javascript" src="catanClient/view/userPanelView.js"></script>
+
+	<!-- Controller -->
+	<script type="text/javascript" src="catanClient/controller/backgroundController.js"></script>
+	<script type="text/javascript" src="catanClient/controller/resourceController.js"></script>
+	<script type="text/javascript" src="catanClient/controller/landController.js"></script>
+	<script type="text/javascript" src="catanClient/controller/catanController.js"></script>
+	<script type="text/javascript" src="catanClient/controller/catan.room.controller.js"></script>
+	<script type="text/javascript" src="catanClient/controller/diceController.js"></script>
+	<script type="text/javascript" src="catanClient/controller/userPanelController.js"></script>
+
+	<script type="text/javascript" src="test.js"></script>
+
+	<script type="text/javascript">
+		testBefore();
+		var resourceArray = [ [ "desert", 8 ], [ "brick", 4 ], [ "sheep", 5 ],
+		                      [ "ore", 3 ], [ "forest", 9 ], [ "grain", 11 ], [ "brick", 10 ],
+		                      [ "sheep", 8 ], [ "ore", 11 ], [ "forest", 6 ], [ "grain", 9 ], [ "brick", 2 ],
+		                      [ "sheep", 10 ], [ "ore", 5 ], [ "forest", 4 ], [ "grain", 3 ],
+		                      [ "brick", 6 ], [ "sheep", 10 ], [ "ore", 12 ] ];
+		catanClient.controller.catanController.init(resourceArray);
+		testAfter();
+
+		/* var usersArray = [ {
+			name : "userRed",
+			index : "red",
+			score : 0,
+			roadCount : 0,
+			resourceCount : 0,
+			soldierCount : 0
+		}, {
+			name : "userGreen",
+			index : "green",
+			score : 0,
+			roadCount : 0,
+			resourceCount : 0,
+			soldierCount : 0
+		}, {
+			name : "userBlue",
+			index : "blue",
+			score : 0,
+			roadCount : 0,
+			resourceCount : 0,
+			soldierCount : 0
+		} ];
+		//UserPanelView.init(usersArray);
+		UserPanelView.showUserName("XXXX", "RED");
+		UserPanelView.showUserScore(0, "RED");
+		UserPanelView.showUserRoadCount(0, "RED");
+		UserPanelView.showUserResourceCount(0, "RED");
+		UserPanelView.showUserSoldierCount(0, "RED");
+		UserPanelView.showUserName("YYYY", "RED");
+		UserPanelView.showUserScore(1, "RED");
+		UserPanelView.showUserRoadCount(1, "RED");
+		UserPanelView.showUserResourceCount(1, "RED");
+		UserPanelView.showUserSoldierCount(1, "RED");
+		
+		UserPanelView.showUserName("XXXX", "YELLOW");
+		UserPanelView.showUserScore(0, "YELLOW");
+		UserPanelView.showUserRoadCount(0, "YELLOW");
+		UserPanelView.showUserResourceCount(0, "YELLOW");
+		UserPanelView.showUserSoldierCount(0, "YELLOW");
+		UserPanelView.showUserName("YYYY", "YELLOW");
+		UserPanelView.showUserScore(1, "YELLOW");
+		UserPanelView.showUserRoadCount(1, "YELLOW");
+		UserPanelView.showUserResourceCount(1, "YELLOW");
+		UserPanelView.showUserSoldierCount(1, "YELLOW");
+		
+		UserPanelView.showUserName("XXXX", "GREEN");
+		UserPanelView.showUserScore(0, "GREEN");
+		UserPanelView.showUserRoadCount(0, "GREEN");
+		UserPanelView.showUserResourceCount(0, "GREEN");
+		UserPanelView.showUserSoldierCount(0, "GREEN");
+		UserPanelView.showUserName("YYYY", "GREEN");
+		UserPanelView.showUserScore(1, "GREEN");
+		UserPanelView.showUserRoadCount(1, "GREEN");
+		UserPanelView.showUserResourceCount(1, "GREEN");
+		UserPanelView.showUserSoldierCount(1, "GREEN");
+		
+		UserPanelView.showUserName("XXXX", "BLUE");
+		UserPanelView.showUserScore(0, "BLUE");
+		UserPanelView.showUserRoadCount(0, "BLUE");
+		UserPanelView.showUserResourceCount(0, "BLUE");
+		UserPanelView.showUserSoldierCount(0, "BLUE");
+		UserPanelView.showUserName("YYYY", "BLUE");
+		UserPanelView.showUserScore(1, "BLUE");
+		UserPanelView.showUserRoadCount(1, "BLUE");
+		UserPanelView.showUserResourceCount(1, "BLUE");
+		UserPanelView.showUserSoldierCount(1, "BLUE"); */
+
+	</script>
+</body>
+</html>
