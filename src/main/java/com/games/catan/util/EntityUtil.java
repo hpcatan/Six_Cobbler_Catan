@@ -4,9 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.games.catan.exception.CatanLogicException;
-import com.sun.xml.internal.ws.util.UtilException;
-
 public class EntityUtil {
 	/**
 	 * get GetMethodName by fieldName.
@@ -33,7 +30,7 @@ public class EntityUtil {
 	 * @return return null if validate success. return a failed message if validate failed.
 	 * @throws UtilException 
 	 */
-	public static String getMessageByValidateEntityStringField(Object entity,String regularExpression) throws CatanLogicException{
+	public static String getMessageByValidateEntityStringField(Object entity,String regularExpression) throws UtilException{
 		Class<? extends Object> clazz = entity.getClass();
 		Field[] fields = clazz.getDeclaredFields();
 		for(Field field:fields){

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catanFlow>
+	<commonOperate id="doLogout" name="doLogout" processClass="logoutOperate">
+		<nextStatus id="successTo" statusId="waitLogin"></nextStatus>
+	</commonOperate>
+	<commonOperate id="queryRoomInfo" name="queryRoomInfo" processClass="queryWaitingRoomInfoOperate"></commonOperate>
+	
+	<firstStatus statusId="waitLogin"></firstStatus>
+		
+	<status id="waitLogin" name="waitLogin" commonOperates="doLogout">
+		<operate id="doLogin" name="doLogin" processClass="loginOperate">
+			<nextStatus id="successTo" statusId="waitSelectRoom"></nextStatus>
+			<nextStatus id="failedTo" statusId="waitLogin"></nextStatus>
+		</operate>
+	</status>
+	
+	<status id="waitSelectRoom" name="waitSelectRoom" commonOperates="doLogout,queryRoomInfo">
+		<operate id="doSelectRoom" name="doSelectRoom" processClass="selectRoomOperate">
+			<nextStatus id="successTo" statusId="waitingGameBegin"></nextStatus>
+			<nextStatus id="failedTo" statusId="waitSelectRoom"></nextStatus>
+			<describe>the player selects a room, and then check the room if the Game could be started.</describe>
+		</operate>
+	</status>
+	
+	<status id="waitingGameBegin" name="waitingGameBegin" commonOperates="doLogout">
+		
+	</status>
+	
+	<status id="inGame_initVillageRoad" name="inGame_initVillageRoad">
+		
+	</status>
+	
+	<status id="inGame_dice" name="inGame_dice">
+		
+	</status>
+	
+	<status id="inGame_operate" name="inGame_operate">
+		
+	</status>
+	
+	<status id="gameOver" name="gameOver">
+		
+	</status>
+</catanFlow>
